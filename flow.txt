@@ -1,0 +1,5 @@
+1. Basic server setup
+2. dp setup and including it in app.go
+3. interface setup for repo
+4. coding repo 
+
