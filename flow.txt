@@ -2,4 +2,13 @@
 2. dp setup and including it in app.go
 3. interface setup for repo
 4. coding repo 
+5. code service
+6. code handler
+7. migration setup 
+migration file
+create migration folder
+migrate create -ext sql -dir migrations -seq create_payments_table
+then sql for migrate up and migrate down files
 
+
+prepared statement issues : maintain single instance of db

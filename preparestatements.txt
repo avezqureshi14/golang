@@ -1,0 +1,5 @@
+Prepared statements are precompiled SQL queries stored on the database side to improve performance and security. They avoid repeated parsing and help prevent SQL injection.
+
+However, they are connection-specific and stateful, which can cause issues in modern applications using connection pooling, ORMs, or multiple database tools.
+
+Because of this added complexity, many systems disable them for stability unless performance optimization is critical.

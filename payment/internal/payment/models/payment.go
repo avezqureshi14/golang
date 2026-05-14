@@ -9,8 +9,8 @@ const (
 )
 
 type Payment struct {
-	ID     int `gorm:"primaryKey"`
-	UserID int
-	Amount int
-	Status PaymentStatus
+	ID     int           `gorm:"primaryKey" json:"id"`
+	UserID int           `json:"userId"`
+	Amount int           `json:"amount"`
+	Status PaymentStatus `json:"status"`
 }

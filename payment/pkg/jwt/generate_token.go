@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	"go-todo-app/pkg/configs"
+	"payment/pkg/configs"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
