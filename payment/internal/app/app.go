@@ -3,6 +3,7 @@ package payment
 import (
 	"fmt"
 	"payment/internal/platform/db"
+	profiler "payment/internal/platform/profiler"
 	"payment/pkg/configs"
 	"payment/pkg/logger"
 
@@ -18,6 +19,8 @@ type App struct {
 func NewApp() *App {
 	r := gin.New()
 	r.Use(gin.Recovery())
+
+	profiler.Register(r)
 
 	logger.Init()
 	defer logger.Sync()

@@ -9,4 +9,6 @@ import (
 func RegisterPaymentRoutes(r *gin.Engine, h *handler.PaymentHandler) {
 	payment := r.Group("/payment")
 	payment.POST("/", h.CreatePayment)
+	payment.GET("/", h.GetAllPayments)
+	payment.PUT("/:id", h.UpdatePayment)
 }

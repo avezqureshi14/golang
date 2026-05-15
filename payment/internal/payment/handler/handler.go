@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"fmt"
 	"net/http"
 	dto "payment/internal/payment/dto"
 	service "payment/internal/payment/service"
@@ -10,26 +11,62 @@ import (
 )
 
 type PaymentHandler struct {
-	service service.PaymentService
+	service *service.PaymentService
 }
 
 func NewPaymentHandler(service *service.PaymentService) *PaymentHandler {
-	return &PaymentHandler{
-		service: *service,
-	}
+	return &PaymentHandler{service: service}
 }
 
 func (h *PaymentHandler) CreatePayment(c *gin.Context) {
 	var req dto.CreatePaymentRequest
-	err := c.ShouldBindJSON(&req)
-	if err != nil {
+
+	if err := c.ShouldBindJSON(&req); err != nil {
 		http_response.SendError(c, http.StatusBadRequest, "invalid body")
 		return
 	}
-	payment, err := h.service.Create(&dto.CreatePaymentRequest{UserID: req.UserID, Amount: req.Amount})
+
+	res, err := h.service.Create(&req)
 	if err != nil {
 		http_response.HandleError(c, err)
 		return
 	}
-	http_response.SendSuccess(c, http.StatusCreated, payment)
+
+	http_response.SendSuccess(c, http.StatusCreated, res)
+}
+
+func (h *PaymentHandler) GetAllPayments(c *gin.Context) {
+
+	res, err := h.service.GetAll()
+	if err != nil {
+		http_response.HandleError(c, err)
+		return
+	}
+
+	http_response.SendSuccess(c, http.StatusOK, res)
+}
+
+func (h *PaymentHandler) UpdatePayment(c *gin.Context) {
+
+	idParam := c.Param("id")
+
+	var id int
+	if _, err := fmt.Sscanf(idParam, "%d", &id); err != nil {
+		http_response.SendError(c, http.StatusBadRequest, "invalid id")
+		return
+	}
+
+	var req dto.UpdatePaymentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		http_response.SendError(c, http.StatusBadRequest, "invalid body")
+		return
+	}
+
+	res, err := h.service.Update(id, req.Status)
+	if err != nil {
+		http_response.HandleError(c, err)
+		return
+	}
+
+	http_response.SendSuccess(c, http.StatusOK, res)
 }

@@ -50,17 +50,21 @@ func (r *PaymentRepo) GetAll() ([]models.Payment, error) {
 
 func (r *PaymentRepo) Update(id int, status models.PaymentStatus) (models.Payment, error) {
 	var payment models.Payment
+
 	err := r.db.First(&payment, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return models.Payment{}, appErr.ErrNotFound
 		}
+		return models.Payment{}, err
 	}
 
 	payment.Status = status
+
 	err = r.db.Save(&payment).Error
 	if err != nil {
 		return models.Payment{}, err
 	}
-	return models.Payment{}, nil
+
+	return payment, nil
 }
