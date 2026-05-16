@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package fraud;
+
+option go_package = "fraud/proto;proto";
+
+service FraudService {
+  rpc CheckFraud (PaymentRequest) returns (FraudResponse);
+}
+
+message PaymentRequest {
+  int32 id = 1;
+  int32 userId = 2;
+  int32 amount = 3;
+  string status = 4;
+}
+
+message FraudResponse {
+  bool isFraud = 1;
+  string message = 2;
+}

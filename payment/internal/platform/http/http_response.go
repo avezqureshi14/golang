@@ -1,4 +1,4 @@
-package http_response
+package payment
 
 import (
 	"net/http"

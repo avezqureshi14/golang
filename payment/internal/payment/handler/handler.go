@@ -26,7 +26,7 @@ func (h *PaymentHandler) CreatePayment(c *gin.Context) {
 		return
 	}
 
-	res, err := h.service.Create(&req)
+	res, err := h.service.Create(c.Request.Context(), &req)
 	if err != nil {
 		http_response.HandleError(c, err)
 		return

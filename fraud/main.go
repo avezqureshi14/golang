@@ -19,8 +19,8 @@ func main() {
 		r := gin.Default()
 		handler.RegisterRoutes(r)
 
-		log.Println("HTTP server running on :8080")
-		http.ListenAndServe(":8080", r)
+		log.Println("HTTP server running on :8081")
+		http.ListenAndServe(":8081", r)
 	}()
 
 	// 🔹 Start gRPC

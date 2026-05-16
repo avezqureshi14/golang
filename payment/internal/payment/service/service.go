@@ -1,25 +1,44 @@
 package payment
 
 import (
+	"context"
 	dto "payment/internal/payment/dto"
 	models "payment/internal/payment/models"
 	repository "payment/internal/payment/repository"
+	fraud_client_grpc "payment/internal/platform/grpc"
+	fraud_client_http "payment/internal/platform/http"
 )
 
 type PaymentService struct {
-	repo repository.PaymentRepository
+	repo                   repository.PaymentRepository
+	fraudClientGRPCService *fraud_client_grpc.FraudClient
+	fraudClientHTTPService *fraud_client_http.FraudHTTPClient
 }
 
-func NewPaymentService(repo repository.PaymentRepository) *PaymentService {
-	return &PaymentService{repo: repo}
+func NewPaymentService(repo repository.PaymentRepository, fraudClientGRPCService *fraud_client_grpc.FraudClient, fraudClientHTTPService *fraud_client_http.FraudHTTPClient) *PaymentService {
+	return &PaymentService{repo: repo, fraudClientGRPCService: fraudClientGRPCService, fraudClientHTTPService: fraudClientHTTPService}
 }
 
-func (s *PaymentService) Create(req *dto.CreatePaymentRequest) (dto.CreatePaymentResponse, error) {
+func (s *PaymentService) Create(ctx context.Context, req *dto.CreatePaymentRequest) (dto.CreatePaymentResponse, error) {
+
+	fraudResp, err := s.fraudClientGRPCService.CheckFraud(ctx, int64(req.UserID), float64(req.Amount))
+	// fraudResp, err := s.fraudClientHTTPService.CheckFraud(ctx, int64(req.UserID), float64(req.Amount))
+	if err != nil {
+		return dto.CreatePaymentResponse{}, err
+	}
+
+	var status models.PaymentStatus
+
+	if fraudResp.IsFraud {
+		status = models.StatusFailed
+	} else {
+		status = models.StatusApproved
+	}
 
 	entity := &models.Payment{
 		UserID: req.UserID,
 		Amount: int(req.Amount),
-		Status: models.StatusCreated,
+		Status: status,
 	}
 
 	created, err := s.repo.Create(entity)
@@ -34,7 +53,6 @@ func (s *PaymentService) Create(req *dto.CreatePaymentRequest) (dto.CreatePaymen
 		Status: dto.PaymentStatus(created.Status),
 	}, nil
 }
-
 func (s *PaymentService) GetAll() ([]dto.GetPaymentResponse, error) {
 
 	payments, err := s.repo.GetAll()

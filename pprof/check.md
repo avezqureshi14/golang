@@ -80,3 +80,8 @@ not freed? → leak
 
 
 
+### Pointers 
+1. repo (if it is struct) → pointer
+2. dto/config → value (because it is a data snapshot used to transfer data between layers , no ownership , no lifecycle)
+3. client (grpc/db/http) → pointer  (you have multiple instances floating around if not used pointer which can crete inconsistent state)
+4. interface → value (interfaces already behave like lightweight references, so copying the interface value is cheap and safe.)
