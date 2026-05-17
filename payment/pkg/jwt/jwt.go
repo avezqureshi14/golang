@@ -1,33 +1,44 @@
 package jwt
 
 import (
-	"net/http"
-	"strings"
+	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
-func JWT() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		auth := c.GetHeader("Authorization")
+var secret = []byte("super-secret-key")
 
-		if auth == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
-			return
-		}
+type Claims struct {
+	Service string `json:"service"`
+	jwt.RegisteredClaims
+}
 
-		tokenStr := strings.Split(auth, "Bearer ")
-		if len(tokenStr) != 2 {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
-			return
-		}
-
-		token, err := ValidateToken(tokenStr[1])
-		if err != nil || !token.Valid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
-			return
-		}
-
-		c.Next()
+func GenerateServiceToken(serviceName string) (string, error) {
+	claims := Claims{
+		Service: serviceName,
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(5 * time.Minute)),
+		},
 	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(secret)
+}
+
+func ValidateToken(tokenStr string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(t *jwt.Token) (any, error) {
+		return secret, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(*Claims)
+	if !ok || !token.Valid {
+		return nil, err
+	}
+
+	return claims, nil
 }

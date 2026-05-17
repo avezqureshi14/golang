@@ -8,6 +8,7 @@ import (
 	repository "payment/internal/payment/repository"
 	fraud_client_grpc "payment/internal/platform/grpc"
 	fraud_client_http "payment/internal/platform/http"
+	"payment/pkg/jwt"
 
 	"google.golang.org/grpc/metadata"
 )
@@ -24,9 +25,19 @@ func NewPaymentService(repo repository.PaymentRepository, fraudClientGRPCService
 
 func (s *PaymentService) Create(ctx context.Context, req *dto.CreatePaymentRequest) (dto.CreatePaymentResponse, error) {
 
+	// this was using shared api key
+	// md := metadata.Pairs(
+	// 	"x-api-key", "fraud-service-secret",
+	// )
+
+	// this one is using jwt token without sharing api secret
+	token, err := jwt.GenerateServiceToken("payment-service")
 	md := metadata.Pairs(
-		"x-api-key", "fraud-service-secret",
+		"authorization", "Bearer "+token,
 	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	ctx = metadata.NewOutgoingContext(context.Background(), md)
 	fraudResp, err := s.fraudClientGRPCService.CheckFraud(ctx, int64(req.UserID), float64(req.Amount))

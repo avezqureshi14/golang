@@ -31,7 +31,8 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(middleware.APIKeyAuthInterceptor),
+		// grpc.UnaryInterceptor(middleware.APIKeyAuthInterceptor),
+		grpc.UnaryInterceptor(middleware.JWTAuthInterceptor),
 	)
 	proto.RegisterFraudServiceServer(grpcServer, &grpcserver.Server{})
 
