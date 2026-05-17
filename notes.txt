@@ -1,0 +1,21 @@
+1. Do man in the middle attack on http connection and also try on HTTPS
+2. Grill with interview questions on the topics u have already done 
+3. Read complex complex concurrency blogs and do them in reality 
+
+
+1. Kafka 
+2. Debugging Setup
+3. Authentication between microservices 
+4. Try Different type of work which can be done by grpc 
+5. Saga Pattern make each service have their own database
+6. Make something with RW Locks , Mutexes which has a transaction
+7. Add something with go routine and background running process 
+8. Write go test on interfaces
+9. Postgres Function 
+10.Cron Job
+11.Rate Limiting
+12.Redis Cache , Writing practices , and cache eviction policies
+
+
+
+with pprof : Add pprof + latency histogram + compare Mutex vs RWMutex under load
