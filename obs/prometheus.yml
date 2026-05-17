@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "obs-service"
+    static_configs:
+      - targets: ["10.194.155.209:8080"]
