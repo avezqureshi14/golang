@@ -19,3 +19,4 @@
 
 
 with pprof : Add pprof + latency histogram + compare Mutex vs RWMutex under load
+go in detail of k6 metrics and make those metrics and decision making my second though which always keeps running 
