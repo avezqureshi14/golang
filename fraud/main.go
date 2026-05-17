@@ -8,6 +8,7 @@ import (
 	"fraud/fraud/proto"
 	grpcserver "fraud/grpc"
 	handler "fraud/handler"
+	"fraud/middleware"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -29,7 +30,9 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(middleware.APIKeyAuthInterceptor),
+	)
 	proto.RegisterFraudServiceServer(grpcServer, &grpcserver.Server{})
 
 	log.Println("gRPC server running on :50051")

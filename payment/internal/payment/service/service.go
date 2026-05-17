@@ -2,11 +2,14 @@ package payment
 
 import (
 	"context"
+	"log"
 	dto "payment/internal/payment/dto"
 	models "payment/internal/payment/models"
 	repository "payment/internal/payment/repository"
 	fraud_client_grpc "payment/internal/platform/grpc"
 	fraud_client_http "payment/internal/platform/http"
+
+	"google.golang.org/grpc/metadata"
 )
 
 type PaymentService struct {
@@ -21,8 +24,16 @@ func NewPaymentService(repo repository.PaymentRepository, fraudClientGRPCService
 
 func (s *PaymentService) Create(ctx context.Context, req *dto.CreatePaymentRequest) (dto.CreatePaymentResponse, error) {
 
+	md := metadata.Pairs(
+		"x-api-key", "fraud-service-secret",
+	)
+
+	ctx = metadata.NewOutgoingContext(context.Background(), md)
 	fraudResp, err := s.fraudClientGRPCService.CheckFraud(ctx, int64(req.UserID), float64(req.Amount))
 	// fraudResp, err := s.fraudClientHTTPService.CheckFraud(ctx, int64(req.UserID), float64(req.Amount))
+	log.Print("my fraud response err", err)
+	log.Print("my fraud response good", fraudResp)
+
 	if err != nil {
 		return dto.CreatePaymentResponse{}, err
 	}
