@@ -1,0 +1,152 @@
+package main
+
+import (
+	"context"
+	"log"
+	"math/rand"
+	"net/http"
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+)
+
+//////////////////////////////////////////////////////////
+// 🔥 METRICS (Prometheus)
+//////////////////////////////////////////////////////////
+
+var (
+	httpRequestsTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "http_requests_total",
+			Help: "Total number of HTTP requests",
+		},
+		[]string{"path", "method", "status"},
+	)
+
+	httpDuration = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    "http_request_duration_seconds",
+			Help:    "Duration of HTTP requests",
+			Buckets: prometheus.DefBuckets,
+		},
+		[]string{"path"},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(httpRequestsTotal)
+	prometheus.MustRegister(httpDuration)
+}
+
+//////////////////////////////////////////////////////////
+// 🔥 TRACING (OpenTelemetry)
+//////////////////////////////////////////////////////////
+
+func initTracer() func() {
+	ctx := context.Background()
+
+	exporter, err := otlptracehttp.New(ctx,
+		otlptracehttp.WithEndpoint("localhost:4318"),
+		otlptracehttp.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exporter),
+		sdktrace.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceName("go-backend"),
+			attribute.String("env", "dev"),
+			attribute.String("version", "1.0.0"),
+		)),
+	)
+
+	otel.SetTracerProvider(tp)
+
+	return func() {
+		_ = tp.Shutdown(ctx)
+	}
+}
+
+//////////////////////////////////////////////////////////
+// 🔥 HANDLER
+//////////////////////////////////////////////////////////
+
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+
+	ctx := r.Context()
+	tr := otel.Tracer("hello-handler")
+
+	// 👇 Proper child span (attached to HTTP span)
+	ctx, span := tr.Start(ctx, "business-logic")
+	defer span.End()
+
+	// 🔥 Add useful attributes
+	userID := rand.Intn(100)
+	span.SetAttributes(
+		attribute.Int("user.id", userID),
+		attribute.String("feature", "hello-api"),
+	)
+
+	// 🔥 Simulate latency variation
+	sleep := 200
+	if rand.Intn(10) < 3 {
+		sleep = 500 // slow request
+		span.SetAttributes(attribute.Bool("slow", true))
+	}
+	time.Sleep(time.Duration(sleep) * time.Millisecond)
+
+	// 🔥 Simulate errors
+	status := 200
+	if rand.Intn(10) < 2 {
+		status = 500
+		http.Error(w, "internal error", http.StatusInternalServerError)
+
+		span.SetAttributes(attribute.Bool("error", true))
+		span.RecordError(context.Canceled)
+
+		httpRequestsTotal.WithLabelValues("/hello", r.Method, "500").Inc()
+		httpDuration.WithLabelValues("/hello").Observe(time.Since(start).Seconds())
+		return
+	}
+
+	w.Write([]byte("hello world"))
+
+	// 🔥 Metrics
+	httpRequestsTotal.WithLabelValues("/hello", r.Method, "200").Inc()
+	httpDuration.WithLabelValues("/hello").Observe(time.Since(start).Seconds())
+
+	_ = ctx
+}
+
+//////////////////////////////////////////////////////////
+// 🔥 MAIN
+//////////////////////////////////////////////////////////
+
+func main() {
+	rand.Seed(time.Now().UnixNano())
+
+	shutdown := initTracer()
+	defer shutdown()
+
+	http.Handle("/api/hello",
+		otelhttp.NewHandler(http.HandlerFunc(helloHandler), "hello-endpoint"),
+	)
+
+	http.Handle("/metrics", promhttp.Handler())
+
+	log.Println("Server running on :8081")
+	log.Fatal(http.ListenAndServe(":8081", nil))
+}

@@ -7,6 +7,6 @@ export const options = {
 };
 
 export default function () {
-  http.get('http://localhost:8080/api/hello');
+  http.get('http://localhost:8081/api/hello');
   sleep(0.1);
 }
