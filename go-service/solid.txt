@@ -1,0 +1,19 @@
+1. What is the full form of SOLID? (0:36 - 1:08)
+He explains that an interviewer will likely ask you to define the acronym:
+
+S: Single Responsibility Principle
+O: Open-Closed Principle
+L: Liskov Substitution Principle
+I: Interface Segregation Principle
+D: Dependency Inversion Principle
+2. How to implement Liskov Substitution Principle? (1:17 - 7:12)
+He asks how to replace superclass objects with subclass objects without breaking the program's logic. He demonstrates this using a Shape interface and Rectangle/Square structs.
+
+3. How to apply the Interface Segregation Principle? (7:14 - 14:05)
+He discusses how to avoid forcing classes to implement methods they don't need (using the example of a Robot vs. a Human to illustrate why we shouldn't create "fat" or bloated interfaces).
+
+4. How to use the Dependency Inversion Principle? (14:06 - 20:00)
+He explains how to prevent high-level modules (business logic) from being directly dependent on low-level modules (like database connections) by using abstraction (interfaces) to decouple them.
+
+
+

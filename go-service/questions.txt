@@ -1,0 +1,10 @@
+1. What is a goroutine and why is it considered a "lightweight thread"? (2:00 - 3:10)
+2. Why do we use channels when implementing goroutines? (3:12 - 3:36)
+3. What is the difference between buffered and unbuffered channels? (3:39 - 5:39)
+4. How does an unbuffered channel behave when reading or writing without a concurrent counterpart? 
+5. What is the difference between concurrency and parallelism in Go? (10:42 - 12:00)
+6. How can you achieve parallelism using runtime.GOMAXPROCS? (14:37 - 16:13)
+7. Which approach consumes more memory? (16:26 - 16:57)
+8. How can you extract unique values from a comma-separated string, and how do you handle potential spaces in the input? (17:46 - 28:07)
+9. How do you calculate the time complexity of the implemented logic? (28:24 - 29:12)
+10. Logical Challenge: How can you reverse a string without using built-in libraries? (29:20 - 30:26)

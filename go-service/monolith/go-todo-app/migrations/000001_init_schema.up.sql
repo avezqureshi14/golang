@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    email TEXT UNIQUE,
+    password TEXT
+);
+
+CREATE TABLE IF NOT EXISTS todos (
+    id SERIAL PRIMARY KEY,
+    title TEXT,
+    done BOOLEAN DEFAULT FALSE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE
+);
