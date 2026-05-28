@@ -86,6 +86,8 @@ close(ch)
 ```
 * If the channel is being filled by many producers then in this case close the channel by creating a separate go routine after wg.Wait inside same go routine , because over here in this case we can't just close one channel after it finished putting value in channel other go routines are also there so we need to wait unitl everyone is done 
 
+* Channels closing need to be done by someone who knows when the go routine is going to get completed , in case of single producer it is closed by producer itself because it knows it will be completed , now lets say if there are multiple producer now in this case no single producer can close the channel because other producer might be sending data on that channel so the person who knows over here that when go rotuine are going to get completed is wg.wait now we will run this wg.wait is separate go routine and then we close the channel
+
 ### Must remember:
 
 * Never send on closed channel

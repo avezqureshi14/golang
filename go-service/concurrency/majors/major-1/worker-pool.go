@@ -58,6 +58,7 @@ func dowork(ctx context.Context, wg *sync.WaitGroup, jobs <-chan Job, results ch
 			time.Sleep(100 * time.Millisecond)
 
 			select {
+			// this ctx done  will help us when consumer stop early , so when consumer stop it will cancel form the context1e
 			case <-ctx.Done():
 				return
 			case results <- Job{ID: val.ID, Status: "Done"}:
@@ -106,7 +107,7 @@ func WorkerPool() {
 			}
 			fmt.Println(res.ID, res.Status)
 
-			// If consumer stops early 
+			// If consumer stops early
 			// simulate early consumer stop (optional test)
 			// if res.ID == "3" {
 			// 	cancel()
