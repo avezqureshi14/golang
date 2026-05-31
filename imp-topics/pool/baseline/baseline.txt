@@ -1,0 +1,47 @@
+PS C:\Users\Admin\Downloads\golang\imp-topics\pool\baseline> go tool pprof http://localhost:8080/debug/pprof/allocs
+Fetching profile over HTTP from http://localhost:8080/debug/pprof/allocs
+Saved profile in C:\Users\Admin\pprof\pprof.main.exe.alloc_objects.alloc_space.inuse_objects.inuse_space.010.pb.gz
+File: main.exe
+Build ID: C:\Users\Admin\AppData\Local\Temp\go-build2878080601\b001\exe\main.exe2026-05-28 12:43:33.1997586 +0530 IST
+Type: alloc_space
+Time: 2026-05-28 13:15:33 IST
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) top
+Showing nodes accounting for 5049.41MB, 99.14% of 5093.45MB total
+Dropped 93 nodes (cum <= 25.47MB)
+      flat  flat%   sum%        cum   cum%
+ 2471.70MB 48.53% 48.53%  5058.92MB 99.32%  main.handler
+ 1527.12MB 29.98% 78.51%  1531.62MB 30.07%  fmt.Sprintf
+ 1046.10MB 20.54% 99.05%  1049.60MB 20.61%  encoding/json.Marshal
+    4.50MB 0.088% 99.14%    28.02MB  0.55%  net/http.(*conn).readRequest
+         0     0% 99.14%  5058.92MB 99.32%  net/http.(*ServeMux).ServeHTTP
+         0     0% 99.14%  5088.94MB 99.91%  net/http.(*conn).serve
+         0     0% 99.14%  5058.92MB 99.32%  net/http.HandlerFunc.ServeHTTP
+         0     0% 99.14%  5058.92MB 99.32%  net/http.serverHandler.ServeHTTP
+(pprof) list main.handler
+Total: 4.97GB
+ROUTINE ======================== main.handler in C:\Users\Admin\Downloads\golang\imp-topics\pool\baseline\main.go
+    2.41GB     4.94GB (flat, cum) 99.32% of Total
+         .          .     17:func handler(w http.ResponseWriter, r *http.Request) {
+         .          .     18:   for i := 0; i < 500; i++ {
+         .          .     19:
+         .          .     20:           // allocation 1
+         .          .     21:           log := Log{
+         .          .     22:                   Timestamp: time.Now().UnixNano(),
+         .          .     23:                   Level:     "INFO",
+   21.50MB   530.52MB     24:                   Message:   fmt.Sprintf("user_id=%d action=login status=success", i),
+         .          .     25:           }
+         .          .     26:
+         .          .     27:           // allocation 2
+  277.01MB     1.30GB     28:           data, _ := json.Marshal(log)
+         .          .     29:
+         .          .     30:           // allocation 3 (string concat internally)
+    1.10GB     2.10GB     31:           final := fmt.Sprintf("LOG: %s\n", string(data))
+         .          .     32:
+    1.02GB     1.03GB     33:           w.Write([]byte(final))
+         .          .     34:   }
+         .          .     35:}
+         .          .     36:
+         .          .     37:func main() {
+         .          .     38:   http.HandleFunc("/", handler)
+(pprof) 

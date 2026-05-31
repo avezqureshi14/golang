@@ -1,0 +1,57 @@
+Admin@Avez MINGW64 ~/Downloads/golang (main)
+$ go tool pprof http://localhost:8080/debug/pprof/allocs
+Fetching profile over HTTP from http://localhost:8080/debug/pprof/allocs
+Saved profile in C:\Users\Admin\pprof\pprof.main.exe.alloc_objects.alloc_space.inuse_objects.inuse_space.011.pb.gz
+File: main.exe
+Build ID: C:\Users\Admin\AppData\Local\Temp\go-build3785805684\b001\exe\main.exe2026-05-28 13:20:05.9601251 +0530 IST
+Type: alloc_space
+Time: 2026-05-28 13:25:37 IST
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) top
+Showing nodes accounting for 1183.55MB, 97.41% of 1215.07MB total
+Dropped 65 nodes (cum <= 6.08MB)
+      flat  flat%   sum%        cum   cum%
+  951.04MB 78.27% 78.27%   953.05MB 78.44%  fmt.Sprintf
+  211.50MB 17.41% 95.68%  1170.05MB 96.30%  main.handler
+       8MB  0.66% 96.34%    38.01MB  3.13%  net/http.(*conn).readRequest
+    7.50MB  0.62% 96.95%     7.50MB  0.62%  net/textproto.readMIMEHeader
+    5.50MB  0.45% 97.41%    20.50MB  1.69%  net/http.readRequest
+         0     0% 97.41%  1170.05MB 96.30%  net/http.(*ServeMux).ServeHTTP
+         0     0% 97.41%  1210.06MB 99.59%  net/http.(*conn).serve
+         0     0% 97.41%  1170.05MB 96.30%  net/http.HandlerFunc.ServeHTTP
+         0     0% 97.41%  1170.05MB 96.30%  net/http.serverHandler.ServeHTTP
+         0     0% 97.41%     7.50MB  0.62%  net/textproto.(*Reader).ReadMIMEHeader (inline)
+(pprof) list main.handler
+Total: 1.19GB
+ROUTINE ======================== main.handler in C:\Users\Admin\Downloads\golang\imp-topics\pool\main.go
+  211.50MB     1.14GB (flat, cum) 96.30% of Total
+         .          .     33:func handler(w http.ResponseWriter, r *http.Request) {
+         .          .     34:   for i := 0; i < 500; i++ {
+         .          .     35:
+         .          .     36:           // ✅ reuse struct
+         .          .     37:           log := logPool.Get().(*Log)
+         .          .     38:           *log = Log{
+         .          .     39:                   Timestamp: time.Now().UnixNano(),
+         .          .     40:                   Level:     "INFO",
+         .   953.05MB     41:                   Message:   fmt.Sprintf("user_id=%d action=login status=success", i),
+         .          .     42:           }
+         .          .     43:
+         .          .     44:           // ✅ reuse buffer
+         .          .     45:           buf := bufPool.Get().(*bytes.Buffer)
+         .          .     46:           buf.Reset()
+         .          .     47:
+         .          .     48:           json.NewEncoder(buf).Encode(log)
+         .          .     49:
+         .          .     50:           // avoid extra string allocation
+  211.50MB   211.50MB     51:           w.Write([]byte("LOG: "))
+         .        4MB     52:           w.Write(buf.Bytes())
+         .          .     53:
+         .        1MB     54:           logPool.Put(log)
+         .   512.02kB     55:           bufPool.Put(buf)
+         .          .     56:   }
+         .          .     57:}
+         .          .     58:
+         .          .     59:func main() {
+         .          .     60:   http.HandleFunc("/", handler)
+(pprof) 
+
