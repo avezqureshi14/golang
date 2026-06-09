@@ -1,0 +1,18 @@
+
+	if wait(reciever) {
+		receiver <- value 
+	} else{
+		if (hasSpace(buffer)){
+			buffer <- value 
+		}else{
+			block sender && sendQueue <- sender 
+		}
+	}
+
+	if (hasData(buffer)){
+		read(buffer)
+	}else if(wait(sender)) {
+		read(sender)
+	}else{
+		block receiver && receiveQueu <- receiver 
+	}

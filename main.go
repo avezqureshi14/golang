@@ -1,23 +1,15 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
+type Config struct {
+	DB_URL   string
+	APP_NAME string
+	PORT     string
+}
 
-var counter = 0
-
-func increment() {
-	for i := 0; i < 1000; i++ {
-		counter++ // ❌ race condition happens here
-	}
+func LoadConfig() *Config {
+	return &
 }
 
 func main() {
-	go increment()
-	go increment()
 
-	time.Sleep(time.Second)
-
-	fmt.Println("Final Counter:", counter)
 }

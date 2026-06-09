@@ -22,6 +22,14 @@ type entry struct {
 	expiry time.Time
 }
 
+/*
+C
+I
+T
+E
+M
+*/
+
 type Cache struct {
 	rwMu      sync.RWMutex
 	items     map[string]*list.Element

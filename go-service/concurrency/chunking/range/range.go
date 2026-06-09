@@ -69,17 +69,18 @@ func RangeChunks() {
 		"primes. took", time.Since(startTime),
 	)
 }
+
 /*
-thread 0 [3 , 10000003) completed in 1m7.1312312s 
- thread 1 [10000003 , 20000003) completed in 1m46.7596404s 
- thread 2 [20000003 , 30000003) completed in 2m9.3692049s 
- thread 3 [30000003 , 40000003) completed in 2m22.7120502s 
- thread 4 [40000003 , 50000003) completed in 2m32.6232265s 
- thread 5 [50000003 , 60000003) completed in 2m42.968535s 
- thread 6 [60000003 , 70000003) completed in 2m49.3670148s 
- thread 7 [70000003 , 80000003) completed in 2m57.8561193s 
- thread 8 [80000003 , 90000003) completed in 2m59.3351834s 
- thread 9 [90000003 , 100000000) completed in 3m2.9483574s 
+thread 0 [3 , 10000003) completed in 1m7.1312312s
+ thread 1 [10000003 , 20000003) completed in 1m46.7596404s
+ thread 2 [20000003 , 30000003) completed in 2m9.3692049s
+ thread 3 [30000003 , 40000003) completed in 2m22.7120502s
+ thread 4 [40000003 , 50000003) completed in 2m32.6232265s
+ thread 5 [50000003 , 60000003) completed in 2m42.968535s
+ thread 6 [60000003 , 70000003) completed in 2m49.3670148s
+ thread 7 [70000003 , 80000003) completed in 2m57.8561193s
+ thread 8 [80000003 , 90000003) completed in 2m59.3351834s
+ thread 9 [90000003 , 100000000) completed in 3m2.9483574s
  checking till  100000000  found  5761455  prime numbers. took  3m2.9484176s
-PS D:\Go Lang\go-service\concurrency> 
- */
+PS D:\Go Lang\go-service\concurrency>
+*/
