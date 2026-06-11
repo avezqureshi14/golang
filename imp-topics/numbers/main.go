@@ -58,9 +58,10 @@ func main() {
 			defer wg.Done()
 			startRange, endRange := getChunks(id, chunkSize)
 			for v := startRange; v < endRange; v++ {
-				fmt.Println(v)
+				// fmt.Println(v)
+				time.Sleep(500 * time.Millisecond)
 			}
-			fmt.Printf("Wroker printed from [%d %d) in %d \n", startRange, endRange, time.Since(startTime))
+			fmt.Printf("Wroker printed from [%d %d) in %v \n", startRange, endRange, time.Since(startTime))
 		}(i)
 	}
 	wg.Wait()

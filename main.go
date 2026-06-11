@@ -1,6 +1,9 @@
+// You can edit this code!
+// Click here and start typing.
 package main
 
 import (
+<<<<<<< Updated upstream
 	"context"
 	"fmt"
 	"sync"
@@ -75,7 +78,36 @@ func main() {
 			return
 		}
 	}
+=======
+	"fmt"
+	"os"
+)
 
+type Config struct {
+	APP_NAME string
+	DB_URL   string
+	PORT     string
+}
+
+func LoadConfig() *Config {
+	return &Config{
+		APP_NAME: getEnv(APP_NAME, "fallbackAppName"),
+		DB_URL:   getEnv(DB_URL, "fallbackDbURL"),
+		PORT:     getEnv(PORT, "fallbackPort"),
+	}
+}
+
+func getEnv(name string, fallback string) string {
+	val, ok := os.LookUpEnv()
+	if ok {
+		return val
+	}
+	return fallback
+}
+>>>>>>> Stashed changes
+
+func main() {
+	fmt.Println("Hello, 世界")
 }
 
 /*

@@ -87,14 +87,14 @@ func (c *Cache) Set(key string, val *model.Product) {
 	}
 
 	// add new
-	ent := &entry{
+	newEntry := &entry{
 		key:    key,
 		value:  val,
 		expiry: time.Now().Add(c.jitterTTL()),
 	}
 
-	elem := c.evictList.PushFront(ent)
-	c.items[key] = elem
+	node := c.evictList.PushFront(newEntry)
+	c.items[key] = node
 
 	// evict if over capacity
 	if c.evictList.Len() > c.capacity {
